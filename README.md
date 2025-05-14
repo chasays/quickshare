@@ -1,142 +1,119 @@
-# 语音生成工具 (CosyVoice)
+# HTML-Go 代码分享平台
 
-这是一个简单易用的语音生成工具，基于CosyVoice2模型，可以将文字转换为自然的语音。
+一个基于 Node.js/Express + MySQL 的在线 HTML/Markdown/SVG/Mermaid 代码片段分享工具，支持密码保护、内容渲染和云端部署，适配 Vercel Serverless 环境。
 
-## 功能特点
+---
 
-- **普通语音生成**：将文字转换为自然语音
-- **方言语音生成**：可生成不同方言的语音（如四川话、东北话等）
-- **情感语音生成**：可生成带有不同情感的语音（如开心、激动、平静等）
-- **情感标记语音**：使用[laughter]等标记控制语音中的情感变化
-- **分段处理长文本**：支持将长文本分段处理，适合生成长篇语音
+## 主要功能
 
-## 使用方法
+- 在线分享 HTML、Markdown、SVG、Mermaid 代码片段
+- 支持密码保护，私密分享
+- 支持内容类型自动检测与高亮渲染
+- 支持最近页面列表
+- 支持用户登录认证（可选）
+- 兼容 Vercel Serverless 部署，所有数据存储于云端 MySQL
 
-1. 运行程序：
-   ```
-   python test1.py
-   ```
+---
 
-2. 选择功能类型：
-   - **简单语音生成**：适合单段文本，可选普通、方言或情感语音
-   - **高级语音生成**：支持情感标记或分段处理
+## 快速开始
 
-3. 按照界面提示操作：
-   - 输入要转换的文字
-   - 选择语音类型或高级功能
-   - 根据选择输入额外信息（如方言类型、情感类型等）
+### 1. 环境准备
+- Node.js 16+
+- MySQL 5.7+/8.0+（推荐使用云数据库，如 PlanetScale、阿里云、腾讯云等）
 
-4. 程序会生成语音文件并显示文件保存位置
-
-## 示例
-
-### 简单语音生成
-```
-===== 欢迎使用语音生成工具 =====
-输入'退出'或'exit'结束程序
-
-请选择功能:
-1. 简单语音生成 - 输入一段文字，选择风格或方言
-2. 高级语音生成 - 使用情感标记或分段处理
-0. 退出程序
-
-请选择 (0/1/2): 1
-
-请输入要转换成语音的文字: 今天天气真好，我很开心！
-
-请选择语音类型:
-1. 普通语音
-2. 方言语音
-3. 情感语音
-请选择 (1/2/3): 2
-请输入方言类型 (如: 四川话、东北话): 四川话
-方言语音已生成: output_今天天气真好，我_四川话.wav
+### 2. 安装依赖
+```bash
+npm install
 ```
 
-### 高级语音生成 - 情感标记
+### 3. 配置环境变量
+在项目根目录创建 `.env` 文件，内容示例：
 ```
-请选择功能:
-1. 简单语音生成 - 输入一段文字，选择风格或方言
-2. 高级语音生成 - 使用情感标记或分段处理
-0. 退出程序
-
-请选择 (0/1/2): 2
-
-请选择高级功能:
-1. 使用情感标记 - 如[laughter]表示笑声
-2. 分段处理长文本
-请选择 (1/2): 1
-
-情感标记示例: [laughter]表示笑声
-请输入带情感标记的文本: 这个笑话真有趣[laughter]，我笑得停不下来了[laughter]
-带情感标记的语音已生成: output_emotion_这个笑话真有趣[la.wav
+MYSQL_HOST=your-mysql-host
+MYSQL_USER=your-mysql-user
+MYSQL_PASSWORD=your-mysql-password
+MYSQL_DATABASE=your-mysql-db
+AUTH_ENABLED=true
+AUTH_PASSWORD=your-admin-password
 ```
 
-### 高级语音生成 - 分段处理
+### 4. 启动本地开发
+```bash
+npm run dev
 ```
-请选择功能:
-1. 简单语音生成 - 输入一段文字，选择风格或方言
-2. 高级语音生成 - 使用情感标记或分段处理
-0. 退出程序
+访问 http://localhost:5678
 
-请选择 (0/1/2): 2
+---
 
-请输入文本段落，每段一行，输入空行结束:
-这是第一段文字，很简短。
-这是第二段文字，稍微长一些，包含了更多的信息。
-这是最后一段，总结前面的内容。
+## Vercel 部署指南
 
-请输入语音风格 (默认'开心'): 平静
-分段处理的语音已生成: output_segments_这是第一段文字，很.wav
+### 1. 配置 `vercel.json`
+```json
+{
+  "version": 2,
+  "builds": [{ "src": "app.js", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "app.js" }]
+}
 ```
 
-## 环境要求
+### 2. 设置环境变量
+在 Vercel 控制台为项目添加以下环境变量：
+- `MYSQL_HOST`
+- `MYSQL_USER`
+- `MYSQL_PASSWORD`
+- `MYSQL_DATABASE`
+- `AUTH_ENABLED`（如需登录认证）
+- `AUTH_PASSWORD`（如需登录认证）
 
-- Python 3.6+
-- PyTorch 和 Torchaudio
-- CosyVoice2模型（需放在 pretrained_models 目录下）
-- 提示音频文件（需放在 asset 目录下）
+### 3. 部署到 Vercel
+- 安装 Vercel CLI（如未安装）：
+  ```bash
+  npm install -g vercel
+  ```
+- 登录 Vercel：
+  ```bash
+  vercel login
+  ```
+- 部署（推荐生产环境）：
+  ```bash
+  vercel --prod
+  ```
+
+---
 
 ## 目录结构
 
 ```
-CosyVoice/
-├── asset/
-│   └── zero_shot_prompt.wav  # 提示音频文件
-├── pretrained_models/
-│   └── CosyVoice2-0.5B/      # 预训练模型
-├── third_party/
-│   └── Matcha-TTS/           # 依赖库
-├── test1.py                  # 主程序
-└── README.md                 # 使用说明
+html-go-express/
+├── app.js                # 主应用入口
+├── models/
+│   ├── db.js             # MySQL 数据库封装
+│   └── pages.js          # 页面数据操作
+├── routes/
+│   └── pages.js          # API 路由
+├── middleware/
+│   └── auth.js           # 认证中间件
+├── utils/                # 工具函数
+├── public/               # 静态资源
+├── views/                # EJS 模板
+├── config.js             # 配置加载
+├── vercel.json           # Vercel 部署配置
+├── package.json
+└── ...
 ```
 
-## 常见问题
+---
 
-1. **问题**：程序报错"导入错误"
-   **解决**：检查是否安装了必要的Python包，执行：`pip install torch torchaudio`
+## 常见问题与注意事项
 
-2. **问题**：程序报错"初始化失败"
-   **解决**：确保模型文件和提示音频文件存在于正确的位置
+- **Vercel 环境不支持本地文件存储**，所有会话和数据均存储于 MySQL。
+- **首次部署会自动建表**，如遇权限问题请检查 MySQL 用户权限。
+- **如需本地测试，需先启动 MySQL 并配置好环境变量。**
+- **如需关闭认证，将 `AUTH_ENABLED` 设为 `false`。**
+- **如需自定义端口，请修改 `config.js` 或设置 `PORT` 环境变量。**
 
-3. **问题**：生成的语音效果不理想
-   **解决**：尝试调整文本内容，或尝试不同的情感/方言类型
+---
 
-## 高级用法
+## 联系与反馈
 
-如果你需要在自己的程序中使用这个语音生成功能，可以直接调用以下函数：
-
-```python
-# 生成普通语音
-output_file = generate_audio("你想要转换的文字", style="开心")
-
-# 生成方言语音
-output_file = generate_dialect("你想要转换的文字", dialect="四川话")
-
-# 生成带情感标记的语音
-output_file = generate_with_emotion_marks("这个笑话真有趣[laughter]")
-
-# 分段处理长文本
-segments = ["第一段文字", "第二段文字", "第三段文字"]
-output_file = generate_from_segments(segments, style="平静")
-``` 
+如有问题或建议，欢迎提交 Issue 或 PR。 
