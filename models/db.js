@@ -25,7 +25,7 @@ const pool = mysql.createPool({
 async function initDatabase() {
   const createTableSQL = `
     CREATE TABLE IF NOT EXISTS pages (
-      id VARCHAR(255) PRIMARY KEY,
+      id VARCHAR(128) PRIMARY KEY,
       html_content TEXT NOT NULL,
       created_at BIGINT NOT NULL,
       password VARCHAR(255),
