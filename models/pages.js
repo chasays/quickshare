@@ -1,18 +1,18 @@
-const { run, get, query } = require('./db');
-const CryptoJS = require('crypto-js');
+const { run, get, query } = require("./db");
+const CryptoJS = require("crypto-js");
 
 /**
  * 生成随机密码（5位纯数字）
  * @returns {string} 返回5位纯数字密码
  */
 function generateRandomPassword() {
-  const chars = '0123456789';
-  let password = '';
+  const chars = "0123456789";
+  let password = "";
   for (let i = 0; i < 5; i++) {
     const randomIndex = Math.floor(Math.random() * chars.length);
     password += chars[randomIndex];
   }
-  console.log('生成密码:', password); // 调试输出
+  console.log("生成密码:", password); // 调试输出
   return password;
 }
 
@@ -23,29 +23,29 @@ function generateRandomPassword() {
  * @param {string} codeType 代码类型（html, markdown, svg, mermaid）
  * @returns {Promise<Object>} 返回生成的URL ID和密码
  */
-async function createPage(htmlContent, isProtected = false, codeType = 'html') {
+async function createPage(htmlContent, isProtected = false, codeType = "html") {
   try {
     // 生成时间戳
     const timestamp = new Date().getTime().toString();
-    
+
     // 生成短ID (7位)
     const hash = CryptoJS.MD5(htmlContent + timestamp).toString();
     const urlId = hash.substring(0, 7);
-    
+
     // 无论是否启用保护，都生成密码
     const password = generateRandomPassword();
-    console.log('生成密码:', password);
-    
+    console.log("生成密码:", password);
+
     // 保存到数据库
     // isProtected决定是否需要密码才能访问
     await run(
-      'INSERT INTO pages (id, html_content, created_at, password, is_protected, code_type) VALUES (?, ?, ?, ?, ?, ?)',
+      "INSERT INTO pages (id, html_content, created_at, password, is_protected, code_type) VALUES (?, ?, ?, ?, ?, ?)",
       [urlId, htmlContent, Date.now(), password, isProtected ? 1 : 0, codeType]
     );
-    
+
     return { urlId, password };
   } catch (error) {
-    console.error('创建页面错误:', error);
+    console.error("创建页面错误:", error);
     throw error;
   }
 }
@@ -57,9 +57,9 @@ async function createPage(htmlContent, isProtected = false, codeType = 'html') {
  */
 async function getPageById(id) {
   try {
-    return await get('SELECT * FROM pages WHERE id = ?', [id]);
+    return await get("SELECT * FROM pages WHERE id = ?", [id]);
   } catch (error) {
-    console.error('获取页面错误:', error);
+    console.error("获取页面错误:", error);
     throw error;
   }
 }
@@ -71,12 +71,14 @@ async function getPageById(id) {
  */
 async function getRecentPages(limit = 10) {
   try {
+    // 强制 limit 为数字，防止 SQL 注入
+    const safeLimit = Number(limit) || 10;
     return await query(
-      'SELECT id, created_at FROM pages ORDER BY created_at DESC LIMIT ?',
-      [limit]
+      "SELECT id, created_at FROM pages ORDER BY created_at DESC LIMIT ?",
+      [safeLimit]
     );
   } catch (error) {
-    console.error('获取最近页面错误:', error);
+    console.error("获取最近页面错误:", error);
     throw error;
   }
 }
@@ -84,5 +86,5 @@ async function getRecentPages(limit = 10) {
 module.exports = {
   createPage,
   getPageById,
-  getRecentPages
+  getRecentPages,
 };

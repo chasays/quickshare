@@ -1,88 +1,84 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const fs = require('fs');
+/**
+ * @file MySQL 数据库连接与操作封装
+ * @description 适用于 Vercel Serverless 环境
+ */
 
-// 数据库文件路径
-const dbPath = path.join(__dirname, '../db/html-go.db');
+const mysql = require("mysql2/promise");
 
-// 确保数据库目录存在
-const dbDir = path.dirname(dbPath);
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+/**
+ * 创建 MySQL 连接池
+ */
+const pool = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+/**
+ * 初始化数据库（如建表）
+ * @returns {Promise<void>}
+ */
+async function initDatabase() {
+  const createTableSQL = `
+    CREATE TABLE IF NOT EXISTS pages (
+      id VARCHAR(255) PRIMARY KEY,
+      html_content TEXT NOT NULL,
+      created_at BIGINT NOT NULL,
+      password VARCHAR(255),
+      is_protected TINYINT DEFAULT 0,
+      code_type VARCHAR(32) DEFAULT 'html'
+    )
+  `;
+  const conn = await pool.getConnection();
+  try {
+    await conn.query(createTableSQL);
+    console.log("数据库初始化成功");
+  } finally {
+    conn.release();
+  }
 }
 
-// 创建数据库连接
-const db = new sqlite3.Database(dbPath);
-
-// 初始化数据库
-function initDatabase() {
-  return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      // 创建页面表
-      db.run(`
-        CREATE TABLE IF NOT EXISTS pages (
-          id TEXT PRIMARY KEY,
-          html_content TEXT NOT NULL,
-          created_at INTEGER NOT NULL,
-          password TEXT,
-          is_protected INTEGER DEFAULT 0,
-          code_type TEXT DEFAULT 'html'
-        )
-      `, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          console.log('数据库初始化成功');
-          resolve();
-        }
-      });
-    });
-  });
+/**
+ * 通用查询
+ * @param {string} sql
+ * @param {Array} params
+ * @returns {Promise<Array>}
+ */
+async function query(sql, params = []) {
+  const [rows] = await pool.query(sql, params);
+  return rows;
 }
 
-// 执行查询的辅助函数
-function query(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+/**
+ * 查询单行
+ * @param {string} sql
+ * @param {Array} params
+ * @returns {Promise<Object>}
+ */
+async function get(sql, params = []) {
+  const [rows] = await pool.query(sql, params);
+  return rows[0] || null;
 }
 
-// 执行单行查询的辅助函数
-function get(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(row);
-      }
-    });
-  });
-}
-
-// 执行更新的辅助函数
-function run(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function(err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ id: this.lastID, changes: this.changes });
-      }
-    });
-  });
+/**
+ * 执行写操作
+ * @param {string} sql
+ * @param {Array} params
+ * @returns {Promise<Object>}
+ */
+async function run(sql, params = []) {
+  const [result] = await pool.query(sql, params);
+  return { insertId: result.insertId, affectedRows: result.affectedRows };
 }
 
 module.exports = {
-  db,
+  pool,
   initDatabase,
   query,
   get,
-  run
+  run,
 };
