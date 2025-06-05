@@ -8,7 +8,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
-const MySQLStore = require("express-mysql-session")(session);
+const { createClient } = require('@supabase/supabase-js');
 const fs = require("fs");
 const { initDatabase } = require("./models/db");
 
@@ -46,28 +46,55 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "15mb" })); // 增加限�
 app.use(cookieParser()); // 解析 Cookie
 app.use(express.static(path.join(__dirname, "public"))); // 静态文件
 
-// MySQL 配置
-const sessionStore = new MySQLStore({
-  host: process.env.MYSQL_HOST,
-  port: 3306,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-});
+// Supabase configuration
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
-// 使用 MySQL 存储 session
+// Session configuration
 app.use(
   session({
-    store: sessionStore,
     secret: "html-go-secret-key",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // 如用 HTTPS，设为 true
+      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
       sameSite: "lax",
     },
+    store: {
+      async get(sid) {
+        const { data, error } = await supabase
+          .from('sessions')
+          .select('*')
+          .eq('sid', sid)
+          .single();
+        
+        if (error || !data) return null;
+        return JSON.parse(data.session);
+      },
+      async set(sid, session) {
+        const { error } = await supabase
+          .from('sessions')
+          .upsert({
+            sid,
+            session: JSON.stringify(session),
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
+          });
+        
+        if (error) console.error('Session store error:', error);
+      },
+      async destroy(sid) {
+        const { error } = await supabase
+          .from('sessions')
+          .delete()
+          .eq('sid', sid);
+        
+        if (error) console.error('Session store error:', error);
+      }
+    }
   })
 );
 

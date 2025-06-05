@@ -1,82 +1,117 @@
 /**
- * @file MySQL 数据库连接与操作封装
- * @description 适用于 Vercel Serverless 环境
+ * @file Supabase 数据库连接与操作封装
+ * @description 使用 Supabase 作为数据库服务
  */
 
-const mysql = require("mysql2/promise");
+const { createClient } = require('@supabase/supabase-js');
 
-/**
- * 创建 MySQL 连接池
- */
-const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+// 创建 Supabase 客户端
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
 /**
  * 初始化数据库（如建表）
  * @returns {Promise<void>}
  */
 async function initDatabase() {
-  const createTableSQL = `
-    CREATE TABLE IF NOT EXISTS pages (
-      id VARCHAR(128) PRIMARY KEY,
-      html_content TEXT NOT NULL,
-      created_at BIGINT NOT NULL,
-      password VARCHAR(255),
-      is_protected TINYINT DEFAULT 0,
-      code_type VARCHAR(32) DEFAULT 'html'
-    )
-  `;
-  const conn = await pool.getConnection();
   try {
-    await conn.query(createTableSQL);
+    // 创建 pages 表
+    const { error } = await supabase.rpc('create_pages_table_if_not_exists');
+    if (error) {
+      console.error('创建表失败:', error);
+      throw error;
+    }
     console.log("数据库初始化成功");
-  } finally {
-    conn.release();
+  } catch (error) {
+    console.error("数据库初始化失败:", error);
+    throw error;
   }
 }
 
 /**
  * 通用查询
- * @param {string} sql
- * @param {Array} params
+ * @param {string} table
+ * @param {Object} options
  * @returns {Promise<Array>}
  */
-async function query(sql, params = []) {
-  const [rows] = await pool.query(sql, params);
-  return rows;
+async function query(table, options = {}) {
+  const { data, error } = await supabase
+    .from(table)
+    .select(options.select || '*')
+    .match(options.match || {})
+    .order(options.order || 'created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
 }
 
 /**
  * 查询单行
- * @param {string} sql
- * @param {Array} params
+ * @param {string} table
+ * @param {Object} match
  * @returns {Promise<Object>}
  */
-async function get(sql, params = []) {
-  const [rows] = await pool.query(sql, params);
-  return rows[0] || null;
+async function get(table, match = {}) {
+  const { data, error } = await supabase
+    .from(table)
+    .select('*')
+    .match(match)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // 记录不存在
+    throw error;
+  }
+  return data;
 }
 
 /**
  * 执行写操作
- * @param {string} sql
- * @param {Array} params
+ * @param {string} table
+ * @param {Object} data
+ * @param {string} operation - 'insert' | 'update' | 'delete'
+ * @param {Object} match - 用于 update 和 delete 操作
  * @returns {Promise<Object>}
  */
-async function run(sql, params = []) {
-  const [result] = await pool.query(sql, params);
-  return { insertId: result.insertId, affectedRows: result.affectedRows };
+async function run(table, data, operation = 'insert', match = {}) {
+  let result;
+  
+  switch (operation) {
+    case 'insert':
+      result = await supabase
+        .from(table)
+        .insert(data)
+        .select();
+      break;
+    case 'update':
+      result = await supabase
+        .from(table)
+        .update(data)
+        .match(match)
+        .select();
+      break;
+    case 'delete':
+      result = await supabase
+        .from(table)
+        .delete()
+        .match(match);
+      break;
+    default:
+      throw new Error(`Unsupported operation: ${operation}`);
+  }
+
+  if (result.error) throw result.error;
+  
+  return {
+    insertId: result.data?.[0]?.id,
+    affectedRows: result.data?.length || 0
+  };
 }
 
 module.exports = {
-  pool,
+  supabase,
   initDatabase,
   query,
   get,
