@@ -52,9 +52,89 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
+// 创建自定义的 session store
+class SupabaseStore extends session.Store {
+  constructor() {
+    super();
+  }
+
+  async get(sid, callback) {
+    try {
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('sid', sid)
+        .single();
+      
+      if (error || !data) {
+        return callback(null, null);
+      }
+      
+      callback(null, JSON.parse(data.session));
+    } catch (err) {
+      callback(err);
+    }
+  }
+
+  async set(sid, session, callback) {
+    try {
+      const { error } = await supabase
+        .from('sessions')
+        .upsert({
+          sid,
+          session: JSON.stringify(session),
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        });
+      
+      if (error) {
+        return callback(error);
+      }
+      
+      callback();
+    } catch (err) {
+      callback(err);
+    }
+  }
+
+  async destroy(sid, callback) {
+    try {
+      const { error } = await supabase
+        .from('sessions')
+        .delete()
+        .eq('sid', sid);
+      
+      if (error) {
+        return callback(error);
+      }
+      
+      callback();
+    } catch (err) {
+      callback(err);
+    }
+  }
+
+  async clear(callback) {
+    try {
+      const { error } = await supabase
+        .from('sessions')
+        .delete()
+        .neq('sid', '');
+      
+      if (error) {
+        return callback(error);
+      }
+      
+      callback();
+    } catch (err) {
+      callback(err);
+    }
+  }
+}
+
 // Session configuration
 app.use(
   session({
+    store: new SupabaseStore(),
     secret: "html-go-secret-key",
     resave: false,
     saveUninitialized: false,
@@ -63,37 +143,6 @@ app.use(
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
       sameSite: "lax",
-    },
-    store: {
-      async get(sid) {
-        const { data, error } = await supabase
-          .from('sessions')
-          .select('*')
-          .eq('sid', sid)
-          .single();
-        
-        if (error || !data) return null;
-        return JSON.parse(data.session);
-      },
-      async set(sid, session) {
-        const { error } = await supabase
-          .from('sessions')
-          .upsert({
-            sid,
-            session: JSON.stringify(session),
-            expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
-          });
-        
-        if (error) console.error('Session store error:', error);
-      },
-      async destroy(sid) {
-        const { error } = await supabase
-          .from('sessions')
-          .delete()
-          .eq('sid', sid);
-        
-        if (error) console.error('Session store error:', error);
-      }
     }
   })
 );
