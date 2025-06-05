@@ -1,4 +1,4 @@
-// HTML-GO 主要JavaScript文件
+// Share AI Web Link 主要JavaScript文件
 // 处理所有用户交互和功能
 
 // 错误提示功能

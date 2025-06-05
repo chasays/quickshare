@@ -1,4 +1,4 @@
-# HTML-Go 代码分享平台
+# Share-AI 代码分享平台
 
 一个基于 Node.js/Express + Supabase 的在线 HTML/Markdown/SVG/Mermaid 代码片段分享工具，支持密码保护、内容渲染和云端部署，适配 Vercel Serverless 环境。
 
@@ -85,7 +85,7 @@ npm run dev
 ## 目录结构
 
 ```
-html-go-express/
+Share-AI-express/
 ├── app.js                # 主应用入口
 ├── models/
 │   ├── db.js             # Supabase 数据库封装

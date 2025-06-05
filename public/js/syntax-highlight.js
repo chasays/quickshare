@@ -1,5 +1,5 @@
 /**
- * HTML-Go 语法高亮功能
+ * Share-AI 语法高亮功能
  * 使用 highlight.js 为代码添加语法高亮
  */
 document.addEventListener('DOMContentLoaded', () => {

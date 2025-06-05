@@ -302,16 +302,35 @@ body {
 
 .cyber-title {
   font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
   font-weight: 700;
-  font-size: 3rem;
-  letter-spacing: -0.025em;
-  background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
-  position: relative;
-  z-index: 2;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  letter-spacing: 2px;
+  margin: 0;
+  padding: 0;
+}
+
+.cyber-title span {
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.cyber-title span:hover {
+  transform: translateY(-5px);
+  text-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+}
+
+.cyber-title .highlight {
+  color: #6366f1;
+  text-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+  font-weight: 800;
+  margin: 0 2px;
+}
+
+.cyber-title .highlight:hover {
+  transform: scale(1.2);
+  text-shadow: 0 0 20px rgba(99, 102, 241, 1);
 }
 
 /* 暗色模式下的光晕效果 */
@@ -414,7 +433,7 @@ body {
 }
 
 .title-container::before {
-  content: "HTML-GO";
+  content: "Share AI Web Link";
   position: absolute;
   top: 0;
   left: 0;

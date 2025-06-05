@@ -1,6 +1,6 @@
-# HTML-Go Express Docker u5b89u88c5u6307u5357
+# Share AI Web Link Express Docker u5b89u88c5u6307u5357
 
-u672cu6587u6863u63d0u4f9bu4e86u4f7fu7528 Docker u90e8u7f72 HTML-Go Express u5e94u7528u7a0bu5e8fu7684u8be6u7ec6u6b65u9aa4u3002
+u672cu6587u6863u63d0u4f9bu4e86u4f7fu7528 Docker u90e8u7f72 Share AI Web Link Express u5e94u7528u7a0bu5e8fu7684u8be6u7ec6u6b65u9aa4u3002
 
 ## u5148u51b3u6761u4ef6
 
@@ -40,28 +40,28 @@ u672cu6587u6863u63d0u4f9bu4e86u4f7fu7528 Docker u90e8u7f72 HTML-Go Express u5e94
 
 2. u6784u5efa Docker u955cu50cf
    ```bash
-   docker build -t html-go-express .
+   docker build -t Share AI Web Link-express .
    ```
 
 3. u521bu5efau6570u636eu5377
    ```bash
-   docker volume create html-go-data
+   docker volume create Share AI Web Link-data
    ```
 
 4. u8fd0u884cu5bb9u5668
    ```bash
-   docker run -d --name html-go-express \
+   docker run -d --name Share AI Web Link-express \
      -p 8888:8888 \
-     -v html-go-data:/usr/src/app/data \
+     -v Share AI Web Link-data:/usr/src/app/data \
      -e NODE_ENV=production \
      -e PORT=8888 \
      --restart unless-stopped \
-     html-go-express
+     Share AI Web Link-express
    ```
 
 5. u67e5u770bu65e5u5fd7uff08u53efu9009uff09
    ```bash
-   docker logs -f html-go-express
+   docker logs -f Share AI Web Link-express
    ```
 
 6. u8bbfu95eeu5e94u7528
@@ -90,22 +90,22 @@ u672cu6587u6863u63d0u4f9bu4e86u4f7fu7528 Docker u90e8u7f72 HTML-Go Express u5e94
 
 - **u505cu6b62u5bb9u5668**
   ```bash
-  docker stop html-go-express
+  docker stop Share AI Web Link-express
   ```
 
 - **u542fu52a8u5bb9u5668**
   ```bash
-  docker start html-go-express
+  docker start Share AI Web Link-express
   ```
 
 - **u91cdu542fu5bb9u5668**
   ```bash
-  docker restart html-go-express
+  docker restart Share AI Web Link-express
   ```
 
 - **u5220u9664u5bb9u5668**
   ```bash
-  docker rm -f html-go-express
+  docker rm -f Share AI Web Link-express
   ```
 
 ## u66f4u65b0u5e94u7528
@@ -131,24 +131,24 @@ u672cu6587u6863u63d0u4f9bu4e86u4f7fu7528 Docker u90e8u7f72 HTML-Go Express u5e94
 
 2. u505cu6b62u5e76u5220u9664u65e7u5bb9u5668
    ```bash
-   docker stop html-go-express
-   docker rm html-go-express
+   docker stop Share AI Web Link-express
+   docker rm Share AI Web Link-express
    ```
 
 3. u91cdu65b0u6784u5efau955cu50cf
    ```bash
-   docker build -t html-go-express .
+   docker build -t Share AI Web Link-express .
    ```
 
 4. u8fd0u884cu65b0u5bb9u5668
    ```bash
-   docker run -d --name html-go-express \
+   docker run -d --name Share AI Web Link-express \
      -p 8888:8888 \
-     -v html-go-data:/usr/src/app/data \
+     -v Share AI Web Link-data:/usr/src/app/data \
      -e NODE_ENV=production \
      -e PORT=8888 \
      --restart unless-stopped \
-     html-go-express
+     Share AI Web Link-express
    ```
 
 ## u81eau5b9au4e49u914du7f6e
@@ -162,12 +162,12 @@ u60a8u53efu4ee5u901au8fc7u4feeu6539 `docker-compose.yml` u6587u4ef6u6216u5728u8f
 
 ## u6570u636eu6301u4e45u5316
 
-u5e94u7528u7a0bu5e8fu7684u6570u636eu5b58u50a8u5728 Docker u5377 `html-go-data` u4e2duff0cu5373u4f7fu5bb9u5668u88abu5220u9664uff0cu6570u636eu4e5fu4f1au4fddu7559u3002
+u5e94u7528u7a0bu5e8fu7684u6570u636eu5b58u50a8u5728 Docker u5377 `Share AI Web Link-data` u4e2duff0cu5373u4f7fu5bb9u5668u88abu5220u9664uff0cu6570u636eu4e5fu4f1au4fddu7559u3002
 
 ### u5907u4efdu6570u636e
 
 ```bash
-docker run --rm -v html-go-data:/data -v $(pwd):/backup alpine tar -czvf /backup/html-go-data-backup.tar.gz /data
+docker run --rm -v Share AI Web Link-data:/data -v $(pwd):/backup alpine tar -czvf /backup/Share AI Web Link-data-backup.tar.gz /data
 ```
 
 ### u6062u590du6570u636e
@@ -176,15 +176,15 @@ docker run --rm -v html-go-data:/data -v $(pwd):/backup alpine tar -czvf /backup
 # u9996u5148u505cu6b62u5bb9u5668
 docker-compose down
 # u6216
-docker stop html-go-express
+docker stop Share AI Web Link-express
 
 # u6062u590du6570u636e
-docker run --rm -v html-go-data:/data -v $(pwd):/backup alpine sh -c "rm -rf /data/* && tar -xzvf /backup/html-go-data-backup.tar.gz -C /"
+docker run --rm -v Share AI Web Link-data:/data -v $(pwd):/backup alpine sh -c "rm -rf /data/* && tar -xzvf /backup/Share AI Web Link-data-backup.tar.gz -C /"
 
 # u91cdu542fu5bb9u5668
 docker-compose up -d
 # u6216
-docker start html-go-express
+docker start Share AI Web Link-express
 ```
 
 ## u6545u969cu6392u9664
@@ -192,19 +192,19 @@ docker start html-go-express
 ### u67e5u770bu5bb9u5668u65e5u5fd7
 
 ```bash
-docker logs -f html-go-express
+docker logs -f Share AI Web Link-express
 ```
 
 ### u68c0u67e5u5bb9u5668u72b6u6001
 
 ```bash
-docker ps -a | grep html-go-express
+docker ps -a | grep Share AI Web Link-express
 ```
 
 ### u8fdbu5165u5bb9u5668u5185u90e8
 
 ```bash
-docker exec -it html-go-express /bin/sh
+docker exec -it Share AI Web Link-express /bin/sh
 ```
 
 ### u5e38u89c1u95eeu9898
@@ -215,7 +215,7 @@ docker exec -it html-go-express /bin/sh
 2. **u6570u636eu6743u9650u95eeu9898**
    u5982u679cu9047u5230u6570u636eu76eeu5f55u6743u9650u95eeu9898uff0cu53efu4ee5u5c1du8bd5u8fdbu5165u5bb9u5668u5e76u624bu52a8u8bbeu7f6eu6743u9650uff1a
    ```bash
-   docker exec -it html-go-express /bin/sh
+   docker exec -it Share AI Web Link-express /bin/sh
    chmod -R 777 /usr/src/app/data
    ```
 
@@ -236,21 +236,21 @@ u5982u679cu60a8u5e0cu671bu5c06u60a8u7684u955cu50cfu63a8u9001u5230 Docker Hubuff0
 
 2. u4e3au60a8u7684u955cu50cfu6253u6807u7b7e
    ```bash
-   docker tag html-go-express u60a8u7684u7528u6237u540d/html-go-express:latest
+   docker tag Share AI Web Link-express u60a8u7684u7528u6237u540d/Share AI Web Link-express:latest
    ```
 
 3. u63a8u9001u955cu50cf
    ```bash
-   docker push u60a8u7684u7528u6237u540d/html-go-express:latest
+   docker push u60a8u7684u7528u6237u540d/Share AI Web Link-express:latest
    ```
 
 4. u4f7fu7528u63a8u9001u7684u955cu50cf
    ```bash
-   docker run -d --name html-go-express \
+   docker run -d --name Share AI Web Link-express \
      -p 8888:8888 \
-     -v html-go-data:/usr/src/app/data \
+     -v Share AI Web Link-data:/usr/src/app/data \
      -e NODE_ENV=production \
      -e PORT=8888 \
      --restart unless-stopped \
-     u60a8u7684u7528u6237u540d/html-go-express:latest
+     u60a8u7684u7528u6237u540d/Share AI Web Link-express:latest
    ```
